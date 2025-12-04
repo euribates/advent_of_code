@@ -6,4 +6,6 @@ Soluciones a los problemas del [Advent of Code](https://adventofcode.com/).
 
     - [Día 1](./2025/day01/)
     - [Día 2](./2025/day02/)
+    - [Día 3](./2025/day03/) (Parcial)
+    - [Día 4](./2025/day04/)
 
