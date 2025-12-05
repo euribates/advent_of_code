@@ -3,7 +3,7 @@
 from core import get_options, load_input
 
 def add_range(fresh_ranges: list, new_range: tuple) -> list:
-    if len(fresh_ranges) > 0: # Trere are at least one
+    if len(fresh_ranges) > 0: # There are at least one
         last_range = fresh_ranges[-1]
         if last_range[1] >= (new_range[0] - 1): # Overlap
             fresh_ranges.pop()
