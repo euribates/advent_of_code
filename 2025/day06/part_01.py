@@ -2,7 +2,7 @@
 
 from core import get_options, load_input
 from operator import mul
-from functools import reduce, partial
+from functools import reduce
 
 def multiply(values):
     return reduce(mul, values, 1)
@@ -20,6 +20,9 @@ def main(options):
                 sol = multiply(nums)
             case _:
                 raise ValueError(f"What the f*&^ing hell is {op}?")
+        if verbose:
+            print(*nums, sep=op, end=' = ')
+            print(sol)
         acc += sol
     print(f'Solution for {main.__doc__}: {acc}')
 

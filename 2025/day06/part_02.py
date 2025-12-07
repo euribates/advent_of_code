@@ -2,24 +2,22 @@
 
 from core import get_options, load_input_part_2
 from operator import mul
-from functools import reduce, partial
+from functools import reduce
 
 
 def get_cols_widths(lines: list[str]) -> list[int]:
     widths = []
     line = [' '] * len(lines[0])
-    print(line)
-    for l in lines:
-        for i, char in enumerate(l):
+    for _l in lines:
+        for i, char in enumerate(_l):
             if char.isdigit():
                 line[i] = '9'
-    print(''.join(line))
     in_digits = True
     prev_index = 0
     for i, char in enumerate(line):
         if char.isdigit():
             if not in_digits:
-                widths.append(i - prev_index)
+                widths.append(i - prev_index - 1)
                 prev_index = i
                 in_digits = True
         else:
@@ -28,61 +26,52 @@ def get_cols_widths(lines: list[str]) -> list[int]:
         widths.append(len(line) - prev_index)
     return widths
 
+
 def multiply(values):
     return reduce(mul, values, 1)
 
 
-def batch(line, size=3):
-    parts = (len(line) + 1) // (size + 1)
-    for i in range(parts):
-        pos = i * size + i
-        yield line[pos: pos + size]
+def print_world(world):
+    for row in world:
+        for num in row:
+            print(num, end=' ')
+        print()
 
 
-def unverticalize(nums: list[list[str]]) -> int:
-    print('\tunverticalize')
-    print('\t', nums, 'nums')
-    num_cols = len(nums[0])
-    print(f'\tnum_cols: {num_cols}')
-    for index in range(num_cols):
-        result = []
-        print(f'\t\tindex: {index}')
-        buff = [num[index] for num in nums]
-        print(f'\t\tbuff: {buff!r}')
-        for j in range(3):
-            acc = []
-            for value in buff:
-                if value[j] != ' ':
-                    acc.append(value[j])
-            print(f'\t\tacc: {acc!r}')
-            if acc:
-                result.append(int(''.join(acc)))
-        print(f"\t\tresult: {result}")
-        yield result
+def transpose(matriz):
+    return list(map(list, zip(*matriz)))
 
 
 def main(options):
     '''Day 6, part 1'''
     verbose = options.verbose
-    *nums, ops = load_input_part_2(options.filename)
-    widths = get_cols_widths(nums)
-    print(widths)
-    return
-    print(f"ops: {ops} nums: {nums!r}")
-    nums = [list(batch(l, 3)) for l in nums]
-    print(f"ops: {ops} nums: {nums!r}")
-    nums = list(unverticalize(nums)) 
-    print(f"ops: {ops} nums: {nums!r}")
-    print()
+    *lines, ops = load_input_part_2(options.filename)
+    widths = get_cols_widths(lines)
+    world = []
+    for line in lines:
+        buff = []
+        index = 0
+        for width in widths:
+            buff.append(line[index:index + width])
+            index += width + 1
+        world.append(buff)
+    cols = len(world[0])
+    rows = len(world)
+    if verbose:
+        print_world(world)
+    if verbose:
+        print(f'cols: {cols}')
+        print(f'rows: {rows}')
     acc = 0
-    for op, num in zip(ops, nums):
-        print(f"- ops: {ops!r}")
-        print(f"- nums: {num!r}")
+    for col in range(cols):
+        op = ops[col]
+        matrix = [list(world[row][col]) for row in range(rows)]
+        operands = [int(''.join(_l)) for _l in transpose(matrix)]
         match op:
             case '+':
-                sol = sum(num)
+                sol = sum(operands)
             case '*':
-                sol = multiply(num)
+                sol = multiply(operands)
             case _:
                 raise ValueError(f"What the f*&^ing hell is {op}?")
         acc += sol
