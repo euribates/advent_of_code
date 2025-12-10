@@ -10,4 +10,5 @@ Soluciones a los problemas del [Advent of Code](https://adventofcode.com/).
     - [Día 4](./2025/day04/) Printing Department
     - [Día 5](./2025/day05/) Cafeteria
     - [Día 6](./2025/day06/) Trash Compactor
+    - [Día 7](./2025/day07/) Laboratories
 
