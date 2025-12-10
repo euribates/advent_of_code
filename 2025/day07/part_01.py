@@ -59,7 +59,7 @@ class Tachyon:
             # print(f'Ananalize {t} (move phase):')
             landing = world[(t.x, t.y + 1)]
             # print(f'\t- World at {t.x}, {t.y + 1} is {landing}')
-            if world[(t.x, t.y + 1)] == '.':
+            if landing == '.':
                 # print(f'\t- Move to {t.x}, {t.y + 1}')
                 if t.y + 1 < world.height:
                     Tachyon(t.x, t.y + 1)
@@ -127,7 +127,6 @@ def main(options):
     if verbose:
         print(dump(world))
         print('move')
-    active_tachyons = Tachyon.actives()
     step = 0
     if verbose:
         print(dump(world), f'step: {step}', sep='\n')
