@@ -43,7 +43,7 @@ def points_not_in_circuits(points, circuits):
 
 
 def main(options):
-    '''Day 8, part 1'''
+    '''Day 8, part 2'''
     verbose = options.verbose
     limit = options.limit
     acc = 0
@@ -88,16 +88,16 @@ def main(options):
             for index, circuit in enumerate(circuits):
                 print(index, circuit, len(circuit))
             input()
-        if i >= limit:
+        not_in_circuit = len(points_not_in_circuits(points, circuits))
+        if len(circuits) == 1 and not_in_circuit == 0:
             break
-    not_in_circuit = len(points_not_in_circuits(points, circuits))
-    print(f'circuits: {len(circuits)}  not in circuit: {not_in_circuit}')
-    sorted_sizes = sorted([len(c) for c in circuits], reverse=True)
-    print(sorted_sizes[0:3])
-    print(sum(sorted_sizes))
-    print(sorted_sizes, sep='+')
-    acc = multiply(sorted_sizes[0:3])
+    print(green('Encontrado'))
+    print(i)
+    print(p0, p1)
+    acc = p0.x * p1.x
+    print(f'{p0.x} * {p1.x} = {acc}')
     print(f'Solution for {main.__doc__}: {acc}')
+
 
 
 if __name__ == '__main__':

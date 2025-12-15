@@ -7,3 +7,10 @@ encrypt:
 [no-cd]
 decrypt:
     gpg --output input --decrypt input.gpg
+
+dot := '.'
+
+[no-cd]
+test +options=dot:
+    @echo {{GREEN}} "Testing" {{NORMAL}}
+    python -m pytest . {{options}}

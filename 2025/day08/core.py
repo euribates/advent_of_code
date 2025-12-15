@@ -5,7 +5,7 @@ from vectors import V3
 
 
 def get_options():
-    parser = argparse.ArgumentParser(prog='AOC day 4')
+    parser = argparse.ArgumentParser(prog='AOC day 8')
     parser.add_argument('filename')
     parser.add_argument('limit', type=int)
     parser.add_argument('-v', '--verbose', action='store_true')
