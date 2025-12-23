@@ -36,10 +36,20 @@ class Game:
         s_fps = f'{actual_fps:.02f} FPS'
         self.label(s_fps, x=2, y=2)
 
-    def dot(self, point, color='white'):
+    def box(self, x0, y0, x1, y1, color="white", scale=None):
+        scale = scale or self.scale
+        x = min(x0, x1)
+        y = min(y0, y1)
+        width = abs(x1 - x0)
+        height = abs(y1 - y0)
+        rect = pygame.Rect(x*scale, y*scale, width*scale, height*scale)        
+        pygame.draw.rect(self.screen, color, rect)
+
+    def dot(self, point, color='white', scale=None):
+        scale = scale or self.scale
         rect = pygame.Rect(
-            point.x * self.scale - 1,
-            point.y * self.scale - 1,
+            point.x * scale - 1,
+            point.y * scale - 1,
             3,
             3,
             )

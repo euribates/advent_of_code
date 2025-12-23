@@ -1,3 +1,5 @@
+NORMAL := '\033[0m'
+GREEN  := '\\e[32m'
 
 [no-cd]
 encrypt:

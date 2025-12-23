@@ -1,78 +1,72 @@
 import pytest
 from vectors import V2
-from frontiers import FilledBoxes
+from frontiers import Frontiers
 
 
-def test_simple_box_bounderies():
-    box = FilledBoxes(4, 5)
-    assert V2(3, 4) not in box
-    assert V2(4, 4) not in box
-    assert V2(5, 4) not in box
-    assert V2(3, 5) not in box
-    assert V2(4, 5) in box
-    assert V2(5, 5) not in box
-    assert V2(3, 6) not in box
-    assert V2(4, 6) not in box
-    assert V2(5, 6) not in box
-
-def test_simple_box_expand_right():
-    box = FilledBoxes(4, 5)
-    box = box.expand_right()
-    assert V2(3, 4) not in box
-    assert V2(4, 4) not in box
-    assert V2(5, 4) not in box
-    assert V2(3, 5) not in box
-    assert V2(4, 5) in box
-    assert V2(5, 5) in box
-    assert V2(3, 6) not in box
-    assert V2(4, 6) not in box
-    assert V2(5, 6) not in box
-
-def test_simple_box_expand_left():
-    box = FilledBoxes(4, 5)
-    box = box.expand_left()
-    assert V2(3, 4) not in box
-    assert V2(4, 4) not in box
-    assert V2(5, 4) not in box
-    assert V2(3, 5) in box
-    assert V2(4, 5) in box
-    assert V2(5, 5) not in box
-    assert V2(3, 6) not in box
-    assert V2(4, 6) not in box
-    assert V2(5, 6) not in box
-
-def test_simple_box_area():
-    box = FilledBoxes(4, 5)
-    assert box.area == 1
-    box = box.expand_left()
-    assert box.area == 2
-    box = box.expand_right()
-    assert box.area == 3
-    box = box.expand_down()
-    assert box.area == 6
-    box = box.expand_up()
-    assert box.area == 9
-
-def test_box_full_expand():
-    box = (
-        FilledBoxes(4, 5)
-        .expand_left()
-        .expand_right()
-        .expand_down()
-        .expand_up()
-        )
-    assert box.area == 9
-    assert V2(3, 4) in box
-    assert V2(4, 4) in box
-    assert V2(5, 4) in box
-    assert V2(3, 5) in box
-    assert V2(4, 5) in box
-    assert V2(5, 5) in box
-    assert V2(3, 6) in box
-    assert V2(4, 6) in box
-    assert V2(5, 6) in box
+def test_simple_frontier():
+    f = Frontiers()
+    f.add(V2(1,1), V2(10, 1))
+    f.add(V2(10,1), V2(10, 10))
+    f.add(V2(10,10), V2(1, 10))
+    f.add(V2(1, 10), V2(1, 1))
+    assert f.is_inside(V2(5, 5)) is True
 
 
+def test_corners():
+    f = Frontiers()
+    f.add(V2(1,1), V2(10, 1))
+    f.add(V2(10,1), V2(10, 10))
+    f.add(V2(10,10), V2(1, 10))
+    f.add(V2(1, 10), V2(1, 1))
+    assert f.is_inside(V2(0, 1)) is False
+    assert f.is_inside(V2(1, 1)) is True
+    assert f.is_inside(V2(2, 1)) is True
+    assert f.is_inside(V2(9, 1)) is True
+    assert f.is_inside(V2(10, 1)) is True
+    assert f.is_inside(V2(11, 1)) is False
+
+    assert f.is_inside(V2(1, 0)) is False
+    assert f.is_inside(V2(1, 1)) is True
+    assert f.is_inside(V2(1, 2)) is True
+    assert f.is_inside(V2(1, 9)) is True
+    assert f.is_inside(V2(1, 10)) is True
+    assert f.is_inside(V2(1, 11)) is False
+
+
+def test_inside():
+    f = Frontiers()
+    f.add(V2(1,1), V2(10, 1))
+    f.add(V2(10,1), V2(10, 10))
+    f.add(V2(10,10), V2(1, 10))
+    f.add(V2(1, 10), V2(1, 1))
+    for y in range(1, 11):
+        for x in range(1, 11):
+            assert f.is_inside(V2(x, y)) is True
+
+def test_get_candidates():
+    f = Frontiers()
+    f.add(V2(1,1), V2(10, 1))
+    f.add(V2(10,1), V2(10, 10))
+    f.add(V2(10,10), V2(1, 10))
+    f.add(V2(1, 10), V2(1, 1))
+    assert f.vertexs == [
+        V2(1,1),
+        V2(10,1),
+        V2(10,10),
+        V2(1, 10),
+        V2(1,1),
+        ]
+
+    candidates = set(f.get_candidates())
+    assert len(candidates) == 6
+    assert candidates == {
+        (V2(1, 1), V2(10, 1), 10.0),
+        (V2(1, 1), V2(10, 10), 100.0),
+        (V2(1, 1), V2(1, 10), 10.0),
+        (V2(10, 1), V2(10, 10), 10.0),
+        (V2(10, 1), V2(1, 10), 100.0),
+        (V2(1, 10), V2(1, 1), 10.0),
+        }
 
 if __name__ == "__main__":
     pytest.main()

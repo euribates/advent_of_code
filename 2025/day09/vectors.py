@@ -18,7 +18,7 @@ class V2:
 
 
 def area(p1: V2, p2: V2) -> int|float:
-    width = (p1.x - p2.x if p1.x > p2.x else p2.x - p1.x) + 1
-    height = (p1.y - p2.y if p1.y > p2.y else p2.y - p1.y) + 1
+    width = abs(p2.x - p1.x) + 1
+    height = abs(p2.y - p1.y) + 1
     return width  * height
 

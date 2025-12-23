@@ -1,138 +1,96 @@
 #!/usr/bin/env python3
 
-import math
-import random
-from itertools import combinations, pairwise
-from functools import cache
-from collections import defaultdict
+from itertools import pairwise
 
-import pygame
-
-from vectors import V2, area
-from colors import red, green, yellow
+from game import Game
+from vectors import V2
 from core import get_options, load_input
-from frontiers import Frontiers, bonded
+from frontiers import Frontiers
 
-# SCALE = .01
-SCALE = 10
-FONT = None
-SCREEN = None
-CLOCK = None
-FPS = 1
+step = 0
+acc = 0
+X0 = 0
+Y0 = 0
+X1 = 0
+Y1 = 0
 
     
-def dot(screen, p, color='white', scale=SCALE):
-    rect = pygame.Rect(p.x * scale, p.y * scale, 3, 3)
-    pygame.draw.rect(screen, color, rect)
-
-
-def get_all_points(width, height):
-    for y in range(height + 1):
-        for x in range(width + 1):
-            yield V2(x, y)
+def check_is_inside(frontiers, x0, y0, x1, y1) -> bool:
+    if not frontiers.is_inside(V2(x0, y1)):
+        return False
+    if not frontiers.is_inside(V2(x1, y0)):
+        return False
+    if y0 > y1:
+        y0, y1 = y1, y0
+    if x0 > x1:
+        x0, x1 = x1, x0
+    for y in range(y0 + 1, y1):
+        if not frontiers.is_inside(V2(x0, y)):
+            return False
+        if not frontiers.is_inside(V2(x1, y)):
+            return False
+    for x in range(x0 + 1, x1):
+        if not frontiers.is_inside(V2(x, y0)):
+            return False
+        if not frontiers.is_inside(V2(x, y1)):
+            return False
+    return True
 
 
 def main(options):
     '''Day 9, part 2.
     '''
-    global SCREEN, FONT, SCALE
-
+    global acc, step
     options = get_options()
-    SCALE = options.scale
     points = list(load_input(options.filename))
-    min_width = min(p.x for p in points)
-    max_width = max(p.x for p in points) + 1
-    width = max_width - min_width + 1
-    min_height = min(p.y for p in points) + 1
-    max_height = max(p.y for p in points)
-    height = max_height - min_height + 1
-    acc = 0
+    width = max(p.x for p in points) + 1
+    height = max(p.y for p in points) + 1
+
     frontiers = Frontiers()
     for v1, v2 in pairwise(points):
         frontiers.add(v1, v2)
     frontiers.add(points[-1], points[0])  # Join last point with first one
-    if options.verbose:
-        print(f'Points: {len(points)}')
-        print(f'Perimeter: {len(frontiers.perimeter)}')
-        print(f'Width: {min_width} ~ {max_width}')
-        print(f'Height: {min_height} ~ {max_height}')
-        print(f'Space is: {width} × {height}')
-        print(f'Líneas horizontales: {len(frontiers.horizontal)}')
-        print(f'Líneas verticales: {len(frontiers.vertical)}')
-        if frontiers.is_inside(V2(7, 2), verbose=True):
-            print('It\'s inside')
-        else:
-            print('It\'s outside')
-        return
-
-
-    pygame.init()
-    FPS = options.fps
-    SCREEN = pygame.display.set_mode(((max_width + 1) * SCALE, (max_height + 1) * SCALE))
-    FONT = pygame.font.SysFont('Serif', 20)
-    clock = pygame.time.Clock()
-    running = True
-
+    size = (len(points) + 1) * len(points)
     candidates = frontiers.get_candidates()
     perimeter = {
-        V2(int(p.x * SCALE), int(p.y * SCALE))
+        V2(int(p.x * options.scale), int(p.y * options.scale))
         for p in frontiers.perimeter
         }
     vertexs = {
-        V2(int(p.x * SCALE), int(p.y * SCALE))
+        V2(int(p.x * options.scale), int(p.y * options.scale))
         for p in frontiers.vertexs
         }
-    while running:
-        # poll for events
-        # pygame.QUIT event means the user clicked X to close your window
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                running = False
-
-        SCREEN.fill("black")
-        s_fps = str(clock.get_fps())
-        text_surface = FONT.render(s_fps, True, 'white')
-        SCREEN.blit(text_surface, (2, 2))
-
+    game = Game(width, height, options)
+    
+    def loop(game: Game):
+        global acc, step, X0, Y0, X1, Y1
+        game.show_fps()
+        step = min(size, step + 1)
+        percent = step * 100.0 / size
+        game.label(f'{step} / {size} {percent:.02f}%', x=2, y=20)
         for p in perimeter:
-            dot(SCREEN, p, 'yellow', scale=1.0)
+            game.dot(p, 'green', scale=1.0)
         for p in vertexs:
-            dot(SCREEN, p, 'green', scale=1.0)
-
+            game.dot(p, 'red', scale=1.0)
         try:
             (p1, p2, area) = next(candidates)
+            if area > acc:
+                game.dot(p1, color='purple')
+                game.dot(p2, color='purple')
+                is_inside = check_is_inside(frontiers, p1.x, p1.y, p2.x, p2.y)
+                if is_inside:
+                    X0 = p1.x
+                    Y0 = p1.y
+                    X1 = p2.x
+                    Y1 = p2.y
+                    print(X0, Y0, X1, Y1)
+                    acc = area
+            game.box(X0, Y0, X1, Y1, 'green')
         except StopIteration:
-            running = False
-
-        if area > acc:
-            dot(SCREEN, p1, color='purple', scale=SCALE)
-            dot(SCREEN, p2, color='purple', scale=SCALE)
-            is_inside = True
-            y0, y1 = bonded(p1.y, p2.y)
-            x0, x1 = bonded(p1.x, p2.x)
-            for y in range(y0, y1 + 1):
-                for x in range(x0, x1 + 1):
-                    if not frontiers.is_inside(V2(x, y)):
-                        is_inside = False
-                        break
-                if is_inside is False:
-                    break
-            rect = pygame.Rect(
-                x0 * SCALE,
-                y0 * SCALE,
-                (x1 - x0) * SCALE,
-                (y1 - y0) * SCALE,
-                )
-            if is_inside:
-                pygame.draw.rect(SCREEN, 'green', rect)
-                acc = max(acc, area)
-            else:
-                pygame.draw.rect(SCREEN, 'red', rect)
-        pygame.display.flip()
-        clock.tick(FPS)  # limits FPS
-
+            return False
+        return True
+    
+    game.run(loop)
 
     print(f'Solution day 2 part 1: {acc}')
 

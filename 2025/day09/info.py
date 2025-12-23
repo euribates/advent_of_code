@@ -11,7 +11,7 @@ from collections import defaultdict
 from vectors import V2, area
 from colors import red, green, yellow
 from core import get_options, load_input
-from frontiers import Frontiers, bonded
+from frontiers import Frontiers
 
 
 

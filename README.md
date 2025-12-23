@@ -11,4 +11,6 @@ Soluciones a los problemas del [Advent of Code](https://adventofcode.com/).
     - [Día 5](./2025/day05/) Cafeteria
     - [Día 6](./2025/day06/) Trash Compactor
     - [Día 7](./2025/day07/) Laboratories
+    - [Día 8](./2025/day08/) Playground
+    - [Día 9](./2025/day09/) Movie Teather
 
