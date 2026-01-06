@@ -65,6 +65,7 @@ def main(options):
     def loop(game: Game):
         global acc, step, X0, Y0, X1, Y1
         game.show_fps()
+        game.box(X0, Y0, X1, Y1, 'green')
         step = min(size, step + 1)
         percent = step * 100.0 / size
         game.label(f'{step} / {size} {percent:.02f}%', x=2, y=20)
@@ -85,9 +86,8 @@ def main(options):
                     Y1 = p2.y
                     print(X0, Y0, X1, Y1)
                     acc = area
-            game.box(X0, Y0, X1, Y1, 'green')
         except StopIteration:
-            return False
+            return True
         return True
     
     game.run(loop)
